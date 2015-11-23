@@ -37,7 +37,7 @@
 					while(true)
 					{
 						System.out.println("Enter your message to the server : ");
-			        	InputStreamReader rd = new InputStreamReader(System.in);
+			        		InputStreamReader rd = new InputStreamReader(System.in);
 						BufferedReader br = new BufferedReader(rd);
 						String temp = br.readLine();
 						output.println(temp);
@@ -45,6 +45,7 @@
 						char[] checkpoint = new char[100];
 						int i=0;
 						int charread;
+						bd.ready();
 						charread=bd.read();
 					
 						while(charread != 13)
