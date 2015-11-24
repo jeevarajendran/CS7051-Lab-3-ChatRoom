@@ -90,6 +90,7 @@ import java.util.ArrayList;
 			public void viewChatRooms()
 			{
 				ListIterator ilview = chatRoomList.listIterator();
+				System.out.println("Chat Rooms Available : \n -------------------");
 				while(ilview.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)ilview.next();
@@ -102,10 +103,10 @@ import java.util.ArrayList;
 				while(illookup.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)illookup.next();
-					System.out.println(cr.chatRoomName);
+					//System.out.println(cr.chatRoomName);
 					if((cr.chatRoomName).equals(chatRoomName))
 					{
-						System.out.println("Found chat room");
+						System.out.println("Found chat room to add client");
 						cr.addClient(clientThread);
 						System.out.println("Client Added");
 						break;
@@ -122,7 +123,7 @@ import java.util.ArrayList;
 					System.out.println(cr.chatRoomName);
 					if((cr.chatRoomName).equals(chatRoomName))
 					{
-						System.out.println("Found chat room for clients display");
+						System.out.println("Found chat room to display client list");
 						ListIterator ilClientDisplay = cr.clientsConnected.listIterator();
 						while(ilClientDisplay.hasNext())
 						{
@@ -141,7 +142,7 @@ import java.util.ArrayList;
 				while(ilchat.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)ilchat.next();
-					System.out.println(cr.chatRoomName);
+					//System.out.println(cr.chatRoomName);
 					if((cr.chatRoomName).equals(chatRoomName))
 					{
 						System.out.println("Found chat room for clients chat");
@@ -149,13 +150,13 @@ import java.util.ArrayList;
 						while(ilClientChat.hasNext())
 						{
 							ClientThread ct = (ClientThread)ilClientChat.next();
-							System.out.println("Client :" + ct.clientId);
+							System.out.println("Send to Client :" + ct.clientId);
 							ct.output.println(message);
 						}
 						break;
 					}					
 				}	
-				System.out.println("Chat with clients done");	
+				System.out.println("Chat with clients done\n ----------------");	
 				
 			}
 	
