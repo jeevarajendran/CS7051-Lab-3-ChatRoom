@@ -111,6 +111,40 @@ import java.util.ArrayList;
 				}
 				displayTheClients(chatRoomName);
 			}
+			public void leaveChatRoom(int chatRoomId,ClientThread clientThread)
+			{
+				ListIterator illeave = chatRoomList.listIterator();
+				while(illeave.hasNext())
+				{
+					ChatRoom cr = (ChatRoom)illeave.next();
+					System.out.println(cr.chatRoomName);
+					if(cr.chatRoomId==chatRoomId)
+					{
+						System.out.println("Found chat room");
+						cr.removeClient(clientThread);
+						System.out.println("Client Added");
+						break;
+					}					
+				}
+				displayTheClients(chatRoomName);
+			}
+			public void chat(int chatRoomId,ClientThread clientThread,String message)
+			{
+				ListIterator ilchat = chatRoomList.listIterator();
+				while(ilchat.hasNext())
+				{
+					ChatRoom cr = (ChatRoom)ilchat.next();
+					System.out.println(cr.chatRoomId);
+					if(cr.chatRoomId==chatRoomId)
+					{
+						System.out.println("Found chat room");
+						cr.chat(clientThread,message);
+						System.out.println("Client Added");
+						break;
+					}					
+				}
+				displayTheClients(chatRoomName);
+			}
 			public void displayTheClients(String chatRoomName)
 			{
 				ListIterator ildisplay = chatRoomList.listIterator();
@@ -132,30 +166,6 @@ import java.util.ArrayList;
 				}	
 				System.out.println("Displayed the clients currently in the chat room");
 			}
-			
-			public void chat(String message, ClientThread clientThread, String chatRoomName)
-			{
-				ListIterator ilchat = chatRoomList.listIterator();
-				while(ilchat.hasNext())
-				{
-					ChatRoom cr = (ChatRoom)ilchat.next();
-					System.out.println(cr.chatRoomName);
-					if((cr.chatRoomName).equals(chatRoomName))
-					{
-						System.out.println("Found chat room for clients chat");
-						ListIterator ilClientChat = cr.clientsConnected.listIterator();
-						while(ilClientChat.hasNext())
-						{
-							ClientThread ct = (ClientThread)ilClientChat.next();
-							System.out.println("Client :" + ct.clientId);
-							//ct.output.println(message);
-						}
-						break;
-					}					
-				}	
-				System.out.println("Chat with clients done");	
-				
-			}
 	
 			public class ClientThread implements Runnable
 			{
@@ -176,6 +186,16 @@ import java.util.ArrayList;
 				public void joinChatRoom(String chatRoomName, ClientThread clientThread)
 				{
 					serverSoc.joinChatRoom(chatRoomName,clientThread);	
+				}
+				
+				public void leaveChatRoom(int chatRoomId, ClientThread clientThread)
+				{
+					serverSoc.leaveChatRoom(chatRoomId,clientThread);	
+				}
+				
+				public void chat(int chatRoomId, ClientThread clientThread,String message)
+				{
+					serverSoc.chat(chatRoomId,clientThread,message);	
 				}
 			
 				@Override			
@@ -211,27 +231,20 @@ import java.util.ArrayList;
 								System.out.println("JOIN CHATROOM INSIDE");				
 								this.clientName = "client1";
 								joinChatRoom("room1",this);
-								System.out.println("Client Joined :)");
-								//serverSoc.lookChatRooms("room1",this);					                   
-								
+								System.out.println("Client Joined :)");					                   
 							}
 							else if(temp.startsWith("CHAT")==true)
 							{
 								System.out.println("CHAT INSIDE");	
 								
-								String message = "CHAT:1\nCLIENT_NAME:client1\nMESSAGE:test\n\n";
-								output.println(message);
-								serverSoc.chat(message, this, "room1");
+								String message = "Hi How r u.";
+								chat(chatRoomId,this,message);
 							}
 							else if(temp.equals("LEAVE_CHATROOM"))
 							{
 								System.out.println("LEAVE CHATROOM INSIDE");
-
-								kill=true;
-								output.println("You are successfully disconnected");
-								output.close();
-								socket.close();
-								serverSoc.killService();
+								leaveChatRoom(chatRoomId,this);
+								System.out.println("Client Left the chat room:)");
 						
 							}
 							else if(temp.equals("KILL_SERVICE"))
@@ -270,6 +283,34 @@ import java.util.ArrayList;
 					this.chatRoomName = chatRoomName;
 					this.chatRoomId = chatRoomId;
 				}
+
+				public void addClient(ClientThread clientThread)
+				{
+					this.clientsConnected.add(clientThread);
+					String messagetoclient = "JOINED_CHATROOM:room1\nSERVER_IP:134.226.58.115\nPORT:7777\nROOM_REF:1\nJOIN_ID:1";
+					sendMessage(messagetoclient,clientThread);
+					chat(clientThread,"client1 has joined the chatroom.");
+				}
+				
+				public void removeClient(ClientThread clientThread)
+				{
+					this.clientsConnected.remove(clientThread);
+					String messagetoclient = "LEFT_CHATROOM:room1\nJOIN_ID:1";
+					sendMessage(messagetoclient,clientThread);
+					chat(clientThread,"client1 has left the chatroom.");
+				}
+
+				public void chat(ClientThread clientThread, String message)
+				{
+					ListIterator ilClientChat = clientsConnected.listIterator();
+					String messageToClient = "CHAT:1\nCLIENT_NAME:client1\nMESSAGE:"+message+"\n\n";
+					while(ilClientChat.hasNext())
+					{
+						ClientThread ct = (ClientThread)ilClientChat.next();
+						sendMessage(messageToClient,ct);
+					}			
+				}
+			
 				public void sendMessage(String messagetoclient,ClientThread clientThread)
 				{
 					try
@@ -284,27 +325,6 @@ import java.util.ArrayList;
 					
 				}
 				
-				public void addClient(ClientThread clientThread)
-				{
-					this.clientsConnected.add(clientThread);
-					String messagetoclient = "JOINED_CHATROOM: room1\nSERVER_IP:134.226.58.115\nPORT:7777\nROOM_REF:1\nJOIN_ID:1";
-								//output.println(messagetoclient);
-								//output.println("CHAT:1\nCLIENT_NAME:client1\nMESSAGE:client1 has joined this chatroom.\n\n");
-					sendMessage(messagetoclient,clientThread);
-					chat(clientThread,"client1 has joined the chatroom.");
-				}
-
-				public void chat(ClientThread clientThread, String message)
-				{
-					ListIterator ilClientChat = clientsConnected.listIterator();
-						while(ilClientChat.hasNext())
-						{
-							String messageToClient = "CHAT: 1\nCLIENT_NAME:client1\nMESSAGE:"+message+"\n";
-							ClientThread ct = (ClientThread)ilClientChat.next();
-							sendMessage(messageToClient,ct);
-						}			
-				}
-			
 			}
 			
 			public static void main(String[] args) throws Exception
