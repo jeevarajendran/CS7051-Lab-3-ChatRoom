@@ -45,9 +45,9 @@ import java.util.ArrayList;
 					{	
 						if(pool.getActiveCount()<pool.getMaximumPoolSize())
 						{										
-							System.out.println("Waiting for a client to get connected (New Prog)\n-------------------------------------");													Socket socket = serverSocket.accept();
+							System.out.println("Waiting for a client to get connected \n-------------------------------------");													Socket socket = serverSocket.accept();
 							clientId++;
-							System.out.println("Connected to a client\n---------------------------------");
+							System.out.println("Connected to a client\n-------------------------------------");
 							ClientThread client = new ClientThread(socket,this,clientId);
 							clientLists.add(client);
 							ServerSoc.pool.execute(client);
@@ -108,7 +108,6 @@ import java.util.ArrayList;
 						break;
 					}					
 				}
-				displayTheClients(chatRoomName);
 			}
 			public void leaveChatRoom(int chatRoomId,ClientThread clientThread)
 			{
@@ -116,13 +115,9 @@ import java.util.ArrayList;
 				while(illeave.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)illeave.next();
-					//System.out.println(cr.chatRoomName);
 					if(cr.chatRoomId==chatRoomId)
 					{
-						//System.out.println("Found chat room");
 						cr.removeClient(clientThread);
-						//System.out.println("Client Removed");
-						//displayTheClients(cr.chatRoomName);
 						break;
 					}					
 				}
@@ -133,7 +128,6 @@ import java.util.ArrayList;
 				while(illeave.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)illeave.next();
-					//System.out.println(cr.chatRoomName);
 					ListIterator ilclientsConnected = cr.clientsConnected.listIterator();
 					while(ilclientsConnected.hasNext())
 					{
@@ -152,13 +146,9 @@ import java.util.ArrayList;
 				while(ilchat.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)ilchat.next();
-					//System.out.println(cr.chatRoomId);
 					if(cr.chatRoomId==chatRoomId)
 					{
-						//System.out.println("Found chat room");
 						cr.chat(clientThread,message);
-						//System.out.println("Client Added");
-						displayTheClients(cr.chatRoomName);
 						break;
 					}					
 				}
@@ -169,10 +159,8 @@ import java.util.ArrayList;
 				while(ildisplay.hasNext())
 				{
 					ChatRoom cr = (ChatRoom)ildisplay.next();
-					//System.out.println(cr.chatRoomName);
 					if((cr.chatRoomName).equals(chatRoomName))
 					{
-						//System.out.println("Found chat room for clients display");
 						ListIterator ilClientDisplay = cr.clientsConnected.listIterator();
 						while(ilClientDisplay.hasNext())
 						{
@@ -247,18 +235,15 @@ import java.util.ArrayList;
 								temp=temp+(String)(ilstring.next());
 							}
 
-							//System.out.println("Message from Client : "+ temp +" \n");
-							
 							
 							if(temp.equals("HELO BASE_TEST"))
 							{
 								String messagetoclient = "HELO BASE_TEST";
-								messagetoclient = messagetoclient + "\nIP:134.226.58.115\nPort:7777\nStudentID:23456";
+								messagetoclient = messagetoclient + "\nIP:134.226.58.160\nPort:7777\nStudentID:23456";
 								output.println(messagetoclient);
 							}
 							else if(temp.startsWith("JOIN_CHATROOM")==true)
 							{	
-								//System.out.println("inside join chatroom");
 								String chatRoomName = ((String)(inputStrings.get(0))).split(":")[1];
 								this.clientName =((String)(inputStrings.get(3))).split(":")[1];
 								joinChatRoom(chatRoomName,this);
@@ -267,22 +252,18 @@ import java.util.ArrayList;
 							else if(temp.startsWith("CHAT")==true)
 							{
 								int chatRoomId =Integer.parseInt( (((String)(inputStrings.get(0))).split(":")[1]).trim());
-								//int joinId =((String)(inputStrings.get(1))).split(":")[1];
 								String message =(((String)(inputStrings.get(3))).split(":")[1].trim());
 								chat(chatRoomId,this,message+"\n\n");
 							}
 							else if(temp.startsWith("LEAVE_CHATROOM")==true)
 							{
-								//System.out.println("inside leave chatroom");
 								int chatRoomId =Integer.parseInt( (((String)(inputStrings.get(0))).split(":")[1]).trim());
 								leaveChatRoom(chatRoomId,this);
-								//System.out.println("Client Left the chat room:)");
 							}
 							else if(temp.startsWith("DISCONNECT")==true)
 							{
 								leaveAllChatRooms(this);
 								socket.close();
-								//killService();
 							}
 							else if(temp.equals("KILL_SERVICE"))
 							{
@@ -296,9 +277,7 @@ import java.util.ArrayList;
 							{
 										
 							}
-							//System.out.println("done with while loop");
 						}
-						//System.out.println("Last");
 					}
 					catch(Exception e)
 					{
@@ -322,15 +301,13 @@ import java.util.ArrayList;
 				public void addClient(ClientThread clientThread)
 				{
 					this.clientsConnected.add(clientThread);
-					String messagetoclient = "JOINED_CHATROOM:"+this.chatRoomName+"\nSERVER_IP:134.226.58.115\nPORT:7777\nROOM_REF:"+this.chatRoomId+"\nJOIN_ID:"+clientThread.clientId+"\n";
+					String messagetoclient = "JOINED_CHATROOM:"+this.chatRoomName+"\nSERVER_IP:134.226.58.160\nPORT:7777\nROOM_REF:"+this.chatRoomId+"\nJOIN_ID:"+clientThread.clientId+"\n";
 					sendMessage(messagetoclient,clientThread);
-					System.out.println("I am going to chat now");
 					chat(clientThread,clientThread.clientName+" has joined this chatroom.\n\n");
 				}
 				
 				public void removeClient(ClientThread clientThread)
 				{
-					System.out.println("inside remove client in chatroom");
 					String messagetoclient = "LEFT_CHATROOM:"+this.chatRoomId+"\nJOIN_ID:"+clientThread.clientId+"\n";
 					sendMessage(messagetoclient,clientThread);
 					chat(clientThread,clientThread.clientName+"  has left this chatroom.\n\n");
@@ -347,17 +324,14 @@ import java.util.ArrayList;
 
 				public void chat(ClientThread clientThread, String message)
 				{
-					System.out.println("Inside the CHAT function");
 					ListIterator ilClientChat = clientsConnected.listIterator();
 					String messageToClient2 = "CHAT:"+this.chatRoomId+"\nCLIENT_NAME:"+clientThread.clientName+"\nMESSAGE:"+message;
-					System.out.println("###### MESSAGE TO CHAT " + messageToClient2);
 					if(!ilClientChat.hasNext())
 					{
 						sendMessage(messageToClient2,clientThread);
 					}
 					while(ilClientChat.hasNext())
 					{
-						System.out.println("Sending the client connected message to all the clients in the chat room");
 						ClientThread ct = (ClientThread)ilClientChat.next();
 						sendMessage(messageToClient2,ct);
 					}
@@ -368,9 +342,9 @@ import java.util.ArrayList;
 				{
 					try
 					{
-					PrintWriter output =  new PrintWriter(clientThread.socket.getOutputStream(),true);
-					System.out.println("Message to Server about client connection : " + messagetoclient);
-					output.printf(messagetoclient);	
+						PrintWriter output =  new PrintWriter(clientThread.socket.getOutputStream(),true);
+						System.out.println("Message to Client / Chat Room : " + messagetoclient);
+						output.printf(messagetoclient);	
 					}
 					catch(Exception e)
 					{
