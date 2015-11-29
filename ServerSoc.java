@@ -32,11 +32,13 @@ import java.util.ArrayList;
 			List<ChatRoom> chatRoomList = new ArrayList<ChatRoom>();
 			List<ClientThread> clientLists = new ArrayList<ClientThread>();
 			
+			//constructor to initialize server socket
 			public ServerSoc(ServerSocket serverSocket)
 			{
 				this.serverSocket = serverSocket;
 			}
-
+			
+			//method to accept client connection
 			public void start()
 			{
 				try
@@ -60,7 +62,8 @@ import java.util.ArrayList;
 					System.out.println(e);
 				}	
 			}
-				
+			
+			//method to close server socket and shut down the pool
 			public void killService()
 			{
 				try
@@ -75,6 +78,7 @@ import java.util.ArrayList;
 				}
 			}
 			
+			//to initialize the chat rooms of server
 			public void initializeChatRooms()
 			{
 				for(int i=0;i<5;i++)
@@ -86,6 +90,8 @@ import java.util.ArrayList;
 					chatRoomList.add(newChatRoom);
 				}
 			}
+			
+			//to list the chat rooms
 			public void viewChatRooms()
 			{
 				ListIterator ilview = chatRoomList.listIterator();
@@ -96,6 +102,8 @@ import java.util.ArrayList;
 					System.out.println(cr.chatRoomId);					
 				}
 			}
+			
+			//method to join the client to a chat room
 			public void joinChatRoom(String chatRoomName,ClientThread clientThread)
 			{
 				ListIterator illookup = chatRoomList.listIterator();
@@ -109,6 +117,8 @@ import java.util.ArrayList;
 					}					
 				}
 			}
+			
+			//method for the client to leave a chat room
 			public void leaveChatRoom(int chatRoomId,ClientThread clientThread)
 			{
 				ListIterator illeave = chatRoomList.listIterator();
@@ -122,6 +132,8 @@ import java.util.ArrayList;
 					}					
 				}
 			}
+			
+			//to disconnect and leave from all the chat rooms
 			public void leaveAllChatRooms(ClientThread clientThread)
 			{
 				ListIterator illeave = chatRoomList.listIterator();
@@ -140,6 +152,8 @@ import java.util.ArrayList;
 					}					
 				}
 			}
+			
+			//method for messaging
 			public void chat(int chatRoomId,ClientThread clientThread,String message)
 			{
 				ListIterator ilchat = chatRoomList.listIterator();
@@ -153,6 +167,7 @@ import java.util.ArrayList;
 					}					
 				}
 			}
+			
 			public void displayTheClients(String chatRoomName)
 			{
 				ListIterator ildisplay = chatRoomList.listIterator();
@@ -173,6 +188,7 @@ import java.util.ArrayList;
 				System.out.println("Displayed the clients currently in the chat room");
 			}
 	
+			//client class
 			public class ClientThread implements Runnable
 			{
 				private Socket socket;
@@ -235,7 +251,7 @@ import java.util.ArrayList;
 								temp=temp+(String)(ilstring.next());
 							}
 
-							
+							//conditions to check the incoming message from client and route accordingly
 							if(temp.equals("HELO BASE_TEST"))
 							{
 								String messagetoclient = "HELO BASE_TEST";
@@ -275,7 +291,7 @@ import java.util.ArrayList;
 							}
 							else
 							{
-										
+								//do nothing		
 							}
 						}
 					}
@@ -298,6 +314,7 @@ import java.util.ArrayList;
 					this.chatRoomId = chatRoomId;
 				}
 
+				//to add a client to the current chat room
 				public void addClient(ClientThread clientThread)
 				{
 					this.clientsConnected.add(clientThread);
@@ -306,6 +323,7 @@ import java.util.ArrayList;
 					chat(clientThread,clientThread.clientName+" has joined this chatroom.\n\n");
 				}
 				
+				//to remove a client from the current chat room
 				public void removeClient(ClientThread clientThread)
 				{
 					String messagetoclient = "LEFT_CHATROOM:"+this.chatRoomId+"\nJOIN_ID:"+clientThread.clientId+"\n";
@@ -315,13 +333,15 @@ import java.util.ArrayList;
 					
 				}
 				
+				//to disconnect from the chat rooms and server
 				public void disconnect(ClientThread clientThread)
 				{
 					chat(clientThread,clientThread.clientName+"  has left this chatroom.\n\n");
 					this.clientsConnected.remove(clientThread);
 					
 				}
-
+				
+				//to message
 				public void chat(ClientThread clientThread, String message)
 				{
 					ListIterator ilClientChat = clientsConnected.listIterator();
@@ -338,6 +358,7 @@ import java.util.ArrayList;
 								
 				}
 			
+				//method to send a message to client / chat room 
 				public void sendMessage(String messagetoclient,ClientThread clientThread)
 				{
 					try
