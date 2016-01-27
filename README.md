@@ -1,2 +1,2 @@
-# PeerToPeer
-Peer to Peer project
+# Chat Room
+Chat Room Lab program
